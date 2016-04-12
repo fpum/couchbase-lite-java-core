@@ -591,8 +591,9 @@ public class Router implements Database.ChangeListener, Database.DatabaseListene
             }
         }
 
+        Header resHeader = connection.getResHeader();
+        resHeader.add("Access-Control-Allow-Origin", "*");
         if (connection.getResponseBody() != null && connection.getResponseBody().isValidJSON()) {
-            Header resHeader = connection.getResHeader();
             if (resHeader != null) {
                 resHeader.add("Content-Type", "application/json");
             } else {
