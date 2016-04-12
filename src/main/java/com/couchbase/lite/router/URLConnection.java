@@ -77,7 +77,7 @@ public class URLConnection extends HttpURLConnection {
 
     @Override
     public String getRequestProperty(String field) {
-        List<String> valuesList = requestProperties.get(field);
+        List<String> valuesList = requestProperties.get(field.toLowerCase());
         if (valuesList == null) {
             return null;
         }
@@ -88,7 +88,7 @@ public class URLConnection extends HttpURLConnection {
     public void setRequestProperty(String field, String newValue) {
         List<String> valuesList = new ArrayList<String>();
         valuesList.add(newValue);
-        requestProperties.put(field, valuesList);
+        requestProperties.put(field.toLowerCase(), valuesList);
     }
 
     @Override
