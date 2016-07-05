@@ -1,24 +1,8 @@
 package com.couchbase.lite.router;
 
 
-import com.couchbase.lite.AsyncTask;
-import com.couchbase.lite.Attachment;
-import com.couchbase.lite.BlobStoreWriter;
-import com.couchbase.lite.ChangesOptions;
-import com.couchbase.lite.CouchbaseLiteException;
-import com.couchbase.lite.Database;
+import com.couchbase.lite.*;
 import com.couchbase.lite.Database.TDContentOptions;
-import com.couchbase.lite.DocumentChange;
-import com.couchbase.lite.Manager;
-import com.couchbase.lite.Mapper;
-import com.couchbase.lite.Misc;
-import com.couchbase.lite.QueryOptions;
-import com.couchbase.lite.QueryRow;
-import com.couchbase.lite.Reducer;
-import com.couchbase.lite.ReplicationFilter;
-import com.couchbase.lite.RevisionList;
-import com.couchbase.lite.Status;
-import com.couchbase.lite.View;
 import com.couchbase.lite.View.TDViewCollation;
 import com.couchbase.lite.auth.FacebookAuthorizer;
 import com.couchbase.lite.auth.PersonaAuthorizer;
@@ -319,7 +303,7 @@ public class Router implements Database.ChangeListener, Database.DatabaseListene
                 message += "_Database";
                 if (!Manager.isValidDatabaseName(dbName)) {
                     Header resHeader = connection.getResHeader();
-                    if (resHeader != null) {
+                    if (resHeader != null && !method.equalsIgnoreCase("OPTIONS")) {
                         resHeader.add("Content-Type", "application/json");
                     }
                     Map<String, Object> result = new HashMap<String, Object>();
@@ -593,6 +577,7 @@ public class Router implements Database.ChangeListener, Database.DatabaseListene
 
         Header resHeader = connection.getResHeader();
         resHeader.add("Access-Control-Allow-Origin", "*");
+        resHeader.add("Access-Control-Allow-Headers", "Accept, Content-Type, Authorization");
         if (connection.getResponseBody() != null && connection.getResponseBody().isValidJSON()) {
             if (resHeader != null) {
                 resHeader.add("Content-Type", "application/json");
@@ -963,6 +948,16 @@ public class Router implements Database.ChangeListener, Database.DatabaseListene
         result.put("instance_start_time", instanceStartTimeMicroseconds);
 
         connection.setResponseBody(new Body(result));
+        return new Status(Status.OK);
+    }
+
+    public Status do_OPTIONS_Database(Database _db, String _docID, String _attachmentName) {
+        // http://wiki.apache.org/couchdb/HTTP_database_API#Database_Information
+        Status status = openDB();
+        if (!status.isSuccessful()) {
+            return status;
+        }
+        connection.getResHeader().add("Access-Control-Allow-Methods", "GET, PUT, DELETE. POST, OPTIONS");
         return new Status(Status.OK);
     }
 
@@ -1634,6 +1629,16 @@ public class Router implements Database.ChangeListener, Database.DatabaseListene
             return new Status(Status.OK);
         } catch (CouchbaseLiteException e) {
             return e.getCBLStatus();
+        }
+    }
+
+    public Status do_OPTIONS_Document(Database _db, String docID, String _attachmentName) {
+        Document doc = db.getExistingDocument(docID);
+        if (doc == null) {
+            return new Status(Status.NOT_FOUND);
+        } else {
+            connection.getResHeader().add("AccessControlAllowMethods", "GET, PUT, DELETE, OPTIONS");
+            return new Status(Status.OK);
         }
     }
 
