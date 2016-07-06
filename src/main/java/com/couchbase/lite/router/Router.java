@@ -1637,7 +1637,7 @@ public class Router implements Database.ChangeListener, Database.DatabaseListene
         if (doc == null) {
             return new Status(Status.NOT_FOUND);
         } else {
-            connection.getResHeader().add("AccessControlAllowMethods", "GET, PUT, DELETE, OPTIONS");
+            connection.getResHeader().add("Access-Control-Allow-Methods", "GET, PUT, DELETE, OPTIONS");
             return new Status(Status.OK);
         }
     }
