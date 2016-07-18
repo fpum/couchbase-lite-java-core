@@ -1495,6 +1495,7 @@ public class Router implements Database.ChangeListener, Database.DatabaseListene
 
         if (continuous || (longpoll && changes.size() == 0)) {
             connection.setChunked(true);
+            sendResponseHeaders(new Status(Status.OK));
             connection.setResponseCode(Status.OK);
             sendResponse();
             if (continuous) {
