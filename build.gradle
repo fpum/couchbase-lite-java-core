@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-version = System.getenv("MAVEN_UPLOAD_VERSION")
+version = '1.1.iis'
 
 sourceCompatibility = 1.6
 
@@ -52,8 +52,8 @@ task uploadArchivesWrapper(dependsOn: createMavenDirectory) << {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: System.getenv("MAVEN_UPLOAD_REPO_URL")) {
-                authentication(userName: System.getenv("MAVEN_UPLOAD_USERNAME"), password: System.getenv("MAVEN_UPLOAD_PASSWORD"))
+            repository(url: "http://maven.iis.fh-bingen.de:8080/artifactory/libs-release-local") {
+                authentication(userName: repository_user, password: repository_passwd)
             }
             pom.version = version
             pom.groupId = 'com.couchbase.lite'
